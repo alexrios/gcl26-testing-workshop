@@ -1,0 +1,5 @@
+.mise.local.toml
+artifacts/
+*.test
+*.out
+bench-*.txt

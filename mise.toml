@@ -1,0 +1,63 @@
+[tools]
+go = "1.27.0"
+
+[tasks.preflight]
+description = "Confirma que o kit distribuido esta integro e o ambiente esta pronto"
+run = "bash scripts/verify.sh"
+
+[tasks.progress]
+description = "Falha enquanto houver TODO obrigatorio e valida os exercicios concluidos"
+run = "bash scripts/check-progress.sh"
+
+[tasks.verify]
+description = "Alias de compatibilidade para o preflight do kit"
+run = "bash scripts/verify.sh"
+
+[tasks.test]
+description = "Executa todos os testes e corpora preservados"
+run = "go test ./..."
+
+[tasks.bench]
+description = "Executa os benchmarks do exercicio 01"
+run = "go test -run='^$' -bench=. -benchmem ./exercises/01-benchmarks"
+
+[tasks.fuzz]
+description = "Executa o fuzzer do exercicio 02 por 20 segundos"
+run = "go test -run='^$' -fuzz=FuzzDecodeNeverPanics -fuzztime=20s ./exercises/02-fuzzing"
+
+[tasks.lifecycle]
+description = "Executa os testes de lifecycle do exercicio 03"
+run = "go test -v ./exercises/03-lifecycle"
+
+[tasks.contracts]
+description = "Executa os testes de contrato do exercicio 04"
+run = "go test -v ./exercises/04-contracts"
+
+[tasks.failure]
+description = "Executa o teste de failure injection do exercicio 05"
+run = "go test -v ./exercises/05-failure-injection"
+
+[tasks.synctest]
+description = "Executa os testes de concorrencia do exercicio 06"
+run = "go test -race -v ./exercises/06-synctest"
+
+[tasks.leaks]
+description = "Executa a deteccao de goroutine leaks do exercicio 07"
+run = "go test -race -count=1 -v ./exercises/07-goroutine-leaks"
+
+[tasks.mutation]
+description = "Executa mutation testing no exercicio bonus 08"
+run = "bash scripts/mutation-check.sh ./exercises/08-mutation-testing"
+
+[tasks.property]
+description = "Executa os property tests do exercicio bonus 09"
+run = """
+go test ./exercises/09-property-tests
+for target in FuzzNormalizeCanonical FuzzNormalizeIdempotent FuzzNormalizeMatchesModel FuzzEquivalentSeparators FuzzDerivedProperty; do
+  go test -run='^$' -fuzz="^${target}$" -fuzztime=3s ./exercises/09-property-tests
+done
+"""
+
+[tasks.property-mutants]
+description = "Compara as propriedades da licao 09 contra tres mutantes"
+run = "bash scripts/property-mutants.sh"
